@@ -1,60 +1,76 @@
-choice = ["Rock", "Paper", "Scissors"];
-let player;
+const container = document.querySelector('#container');
 
-function promptPlayer() {
-  player = prompt("Rock, Paper, or Scissors?");
-  player = player[0].toUpperCase() + player.slice(1).toLowerCase();
-}
+const btnRock = document.querySelector('#btnRock');
+const btnPaper = document.querySelector('#btnPaper');
+const btnScissors = document.querySelector('#btnScissors');
 
-let result = "draw";
+btnRock.addEventListener('click', () => { playRound("Rock", getComputerChoice()) });
+btnPaper.addEventListener('click', () => { playRound("Paper", getComputerChoice()) });
+btnScissors.addEventListener('click', () => { playRound("Scissors", getComputerChoice()) });
+
+const result = document.querySelector('#result');
+const score = document.querySelector('#score');
+const winner = document.querySelector('#winner');
+
+let you = 0;
+let cpu = 0;
 
 function getComputerChoice() {
+  const choice = ["Rock", "Paper", "Scissors"];
   const idx = Math.floor(Math.random() * 3);
   return choice[idx];
 }
 
 function playRound(playerSelection, computerSelection) {
-  const win = `You Win! ${playerSelection} beats ${computerSelection}`;
-  const lose = `You Lose! ${computerSelection} beats ${playerSelection}`;
-  const draw = `It's a Draw! You both picked ${playerSelection}`;
+  const win = `You Win! ${playerSelection} beats ${computerSelection}.`;
+  const lose = `You Lose! ${computerSelection} beats ${playerSelection}.`;
+  const draw = `It's a Draw! You both picked ${playerSelection}.`;
 
   if (playerSelection === computerSelection) {
-    return draw;
+    result.textContent = draw;
   }
   else if ((playerSelection === "Rock" && computerSelection === "Scissors") ||
-           (playerSelection === "Scissors" && computerSelection === "Paper") ||
-           (playerSelection === "Paper" && computerSelection === "Rock")) {
-    result = "win"
-    return win;
+          (playerSelection === "Scissors" && computerSelection === "Paper") ||
+          (playerSelection === "Paper" && computerSelection === "Rock")) {
+    result.textContent = win;
+    you++;
   }
   else {
-    result = "loss";
-    return lose;
+    result.textContent = lose;
+    cpu++;
+  }
+  score.textContent = `YOU ${you} - ${cpu} CPU`;
+
+  if (you === 5) {
+    winner.textContent = "WINNER POG";
+    restartGame();
+  } else if (cpu === 5) {
+    winner.textContent = "LOSER HAHAHA";
+    restartGame();
   }
 }
 
-function keepGoing(you, cpu, games) {
-  if (you === 3 || cpu === 3 || games === 5)
-    return false;
-  return true;
-}
+function restartGame() {
+  btnRock.disabled = true;
+  btnPaper.disabled = true;
+  btnScissors.disabled = true;
 
-function game() {
-  let you = 0;
-  let cpu = 0;
-  let games = 0;
-  while (keepGoing(you, cpu, games)) {
-    result = "draw";
-    promptPlayer();
-    games++;
-    console.log(playRound(player, getComputerChoice()));
-    if (result === "win") {
-      you++;
-    } else if (result === "loss") {
-      cpu++;
-    }
-    console.log(`game ${games}: you ${you} - ${cpu} computer\n`);
-  }
-}
+  const restart = document.querySelector('#restart');
+  const playAgain = document.createElement('button');
+  
+  restart.appendChild(playAgain);
 
-game();
+  playAgain.textContent = "PLAY AGAIN";
+
+  playAgain.addEventListener('click', () => {
+    result.textContent = '';
+    score.textContent = '';
+    winner.textContent = '';
+    you = 0;
+    cpu = 0;
+    btnRock.disabled = false;
+    btnPaper.disabled = false;
+    btnScissors.disabled = false;
+    restart.removeChild(playAgain);
+  });
+}
